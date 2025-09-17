@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    
+    <form action="">
+        <label for="">Numero1</label>
+        <input type="number" id="num1">
+
+
+        <button type="button" onclick="mostrarNumero()">Mostrar</button>
+    </form>
+    <div id="num"></div>
+
+    <script>
+    /* 11. Crea un array con 100 valores aleatorios. Luego crea un formulario donde ingreses un número y un
+botón “Buscar” que muestre un mensaje avisando si el número ingresado se encuentra o no en el
+array.*/ 
+
+        let numero1 =  parseInt(document.getElementById("num1").value)
+        let lista = []
+        for (let i = 0; i < 100; i++) {
+            
+            let numero = Math.floor(Math.random() * (100 - 0) + 0)
+            lista.push(numero) 
+        }
+        console.log(lista)
+            
+
+        function mostrarNumero(){
+            for (let i = 0; i < lista.length; i++) {
+                if (numero1 == lista[i]) {
+                    document.write(i)
+                    console.log(numero1,"Espacio" ,i)
+                }
+            }
+        }
+        
+    </script>
+</body>
+</html>

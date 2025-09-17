@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    
+    <form action="">
+        <label for="">Numero1</label>
+        <input type="number" id="num1">
+
+        <label for="">Numero2</label>
+        <input type="number2" id="num2">
+
+        <button type="button" onclick="mostrar()">Mostrar</button>
+    </form>
+    <div id="num">
+    </div>
+
+    <script>
+    /* Crea un formulario donde ingreses dos valores numéricos, y un botón “Mostrar” que muestre los
+valores que hay entre los dos números ingresados. */ 
+
+        function mostrar(){
+            
+           let numero1 =  parseInt(document.getElementById("num1").value)
+           let numero2 =  parseInt(document.getElementById("num2").value)
+           let numGuardado = 0
+           
+           if (numero1 > numero2){
+                numGuardado = numero1
+                numero1 = numero2
+                numero2 = numGuardado
+           }
+
+            else if(numero1 == numero2){
+                alert("Numeros iguales")
+            }
+            
+            for (let i = numero1 +1; i < numero2; i++) {
+                alert(i)
+            }
+                      
+        }
+        
+        
+    </script>
+</body>
+</html>

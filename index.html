@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>numeros ascendentes</h1>
+    <script>
+        
+
+        function cargarNumeros(max) {
+            let numeros = [];
+            while (numeros.length < 50) {
+                let random = Math.floor(Math.random() * max);
+                numeros.push(random);
+            }
+            console.log(numeros);
+            return numeros;
+        };
+
+        let numeros = cargarNumeros(100);
+
+        function sumarNumeros(n) {
+            let suma = 0;
+            for (let i = 1; i < n.length; i++) {
+                suma += n[i];   
+            }
+            console.log(suma);
+            return suma;
+        }
+        console.log("SUMA Y PROMEDIO");
+        let total = sumarNumeros(numeros);
+        
+        let promedio = total / 50
+
+        console.log(promedio)
+        console.log("Buscar y mostrar el mayor y el menor de los valores");
+
+        function MayorMenor(numeros){
+            let NumMenor = 100
+            let NumMayor = 0
+            for (let i = 0; i < numeros.length; i++) {
+                if(numeros[i] < NumMenor){
+                    NumMenor = numeros[i]
+                }
+                if (numeros[i] > NumMayor) {
+                    NumMayor = numeros[i]
+                }
+
+            }
+            console.log(NumMenor, NumMayor)  
+        }
+    
+        MayorMenor(numeros)
+
+        function MostrarMayorPromedio(numeros, promedio) {
+            
+            let CantidadMayorPromedio = 0
+            for (let i = 0; i < numeros.length; i++) {
+                if(numeros[i] > promedio)
+                    CantidadMayorPromedio++
+            }
+
+            console.log(CantidadMayorPromedio)
+        }
+        
+        MostrarMayorPromedio(numeros,promedio)
+
+        /* Imprimir los números del 1 al 100, cuando aparezca un número divisible por 3 imprimir “Fizz”, y si
+es divisible por 5 imprimir “Buzz”, si es divisible por 3 y por 5 imprimir “Fizz Buzz”.*/
+
+        
+            
+
+    </script>
+</body>
+</html>
