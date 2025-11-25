@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tareas</title>
+  <style>
+    body {
+      background-color: #2f3b3e;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .controls {
+      margin-right: 40px;
+      text-align: left;
+    }
+    input {
+      width: 150px;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 8px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-agregar { background-color: #4CAF50; }
+    .btn-buscar { background-color: #2196F3; }
+    .btn-eliminar { background-color: #f44336; }
+    .btn-modificar { background-color: #ff9800; }
+    table {
+      width: 600px;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #78909c;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #546e7a;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Tareas</h1>
+  
+  <div class="container">
+    <div class="controls">
+      <label for="idInput">Id de tarea</label><br>
+      <input type="text" id="idInput" placeholder="Ej: 101"><br>
+      <label for="tareaInput">Tarea</label><br>
+      <input type="text" id="tareaInput" placeholder="Descripción de la tarea"><br>
+      <button class="btn-agregar" onclick="agregar()">Agregar</button>
+      <button class="btn-buscar" onclick="buscar()">Buscar</button>
+      <button class="btn-eliminar" onclick="eliminar()">Eliminar</button>
+      <button class="btn-modificar" onclick="modificar()">Modificar</button>
+    </div>
+  </div>
+
+  <table id="tablaTareas">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Tarea</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p>Cantidad de tareas programadas: <span id="contadorTareas">0</span></p>
+
+  
+  <script>
+
+    let lista = new Lista();
+    let idCounter = 1;
+
+
+    function Lista() {
+      this.cabecera = null;
+    }
+
+    function Nodo(id, valor) {
+      this.id = id;
+      this.valor = valor;
+      this.siguiente = null;
+    }
+
+    Lista.prototype.add = function(id, valor) {
+      const nuevoNodo = new Nodo(id, valor);
+      if (this.cabecera === null) {
+        this.cabecera = nuevoNodo;
+      } else {
+        let enlace = this.cabecera;
+        while (enlace.siguiente !== null) {
+          enlace = enlace.siguiente;
+        }
+        enlace.siguiente = nuevoNodo;
+      }
+    };
+    
+    Lista.prototype.buscar = function(id) {
+      let referencia = this.cabecera;
+      while (referencia !== null) {
+        if (referencia.id == id) {
+          return referencia; 
+        }
+        referencia = referencia.siguiente;
+      }
+      return null;
+    };
+
+    Lista.prototype.eliminar = function(id) {
+      if (!this.cabecera) {
+        return false;
+      }
+      if (this.cabecera.id == id) {
+        this.cabecera = this.cabecera.siguiente;
+        return true;
+      }
+      let referencia = this.cabecera;
+      while (referencia.siguiente !== null && referencia.siguiente.id != id) {
+        referencia = referencia.siguiente;
+      }
+      if (referencia.siguiente !== null) {
+        referencia.siguiente = referencia.siguiente.siguiente;
+        return true;
+      }
+      return false;
+    };
+
+    Lista.prototype.modificar = function(id, nuevoValor) {
+      let nodo = this.buscar(id);
+      if (nodo) {
+        nodo.valor = nuevoValor;
+        return true;
+      }
+      return false;
+    };
+    
+    // Funciones sobre el Domm 
+    const idInput = document.getElementById("idInput");
+    const tareaInput = document.getElementById("tareaInput");
+    const tablaBody = document.querySelector("#tablaTareas tbody");
+    const contadorSpan = document.getElementById("contadorTareas");
+    let idEncontrado = document.getElementById("idEncontrado")
+
+    function agregar() {
+      let tarea = tareaInput.value;
+      if (tarea !== "") {
+        lista.add(idCounter, tarea); 
+        idCounter++; 
+        tareaInput.value = "";
+        mostrarLista();
+      }
+    }
+    
+    function buscar() {
+      let valor = "No encontrado"
+      let id = idInput.value;
+      if (id !== "") {
+        let valor = 
+        if(lista.buscar(id)){
+
+        } 
+          
+         
+      }
+    }
+    
+    function eliminar() {
+      let id = idInput.value;
+      if (id !== "") {
+        if (lista.eliminar(id)) {
+          mostrarLista();
+        }
+      }
+    }
+
+    function modificar() {
+      let id = idInput.value;
+      let nuevaTarea = tareaInput.value;
+      if (id !== "" && nuevaTarea !== "") {
+        if (lista.modificar(id, nuevaTarea)) {
+          mostrarLista();
+        }
+      }
+    }
+
+    function mostrarLista() {
+      tablaBody.innerHTML = '';
+      let referencia = lista.cabecera;
+      let count = 0;
+      while (referencia !== null) {
+        const filaHTML = `
+          <tr>
+            <td>${referencia.id}</td>
+            <td>${referencia.valor}</td>
+          </tr>
+        `;
+        tablaBody.innerHTML += filaHTML;
+        referencia = referencia.siguiente;
+        count++;
+      }
+      contadorSpan.textContent = count;
+    }
+  </script>
+</body>
+</html>

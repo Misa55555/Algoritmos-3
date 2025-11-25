@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Cargar carrreras</h1>
+    
+    <form id="formularioCarreras">
+        <label for="carreraInput">Carrera</label>
+        <input type="text" id="carreraInput" required>
+        <br>
+        <label for="descripcionInput"> Descripcion: </label>
+        <input type="text" id="descripcionInput" required>
+        <br>
+        <button type="button" onclick="agregarCarrera()"> agregar carrera</button>
+    </form>
+
+    <h2>Lista de carreras</h2>
+
+    <table id="tablaCarreras">
+        <thead>
+            <tr>
+                <th>Carrera</th>
+                <th>Descripcion</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+    <script>
+        let carreras = []
+
+        const carreraInput = document.getElementById('carreraInput')
+        const descripcionInput = document.getElementById('descripcionInput')
+        const tablaBody = document.querySelector('#tablaCarreras tbody')
+
+        function agregarCarrera(){
+            let nuevaCarrera = carreraInput.value
+            let nuevaDescripcion = descripcionInput.value
+
+            if(nuevaCarrera !== "" && nuevaDescripcion !== ""){
+                let objCarrera = {
+                    carrera: nuevaCarrera,
+                    descripcion: nuevaDescripcion
+                }
+
+                carreras.push(objCarrera)
+
+                carreraInput.value = ""
+                descripcionInput.value = ""
+                mostrarCarreras()
+
+            }
+
+        }
+
+
+        function mostrarCarreras(){ 
+            tablaBody.innerHTML = ""
+
+            for (let i = 0; i < carreras.length; i++) {
+                const carreraActual = carreras[i]
+
+                const fila = `
+                    <tr>
+                        <td> ${carreraActual.carrera} </td>
+                        <td> ${carreraActual.descripcion}</td>
+
+                    </tr>
+                `
+                tablaBody.innerHTML += fila
+            } 
+        }
+    </script>
+</body>
+</html>

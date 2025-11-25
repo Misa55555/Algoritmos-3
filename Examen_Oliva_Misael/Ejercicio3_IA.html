@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tareas</title>
+  <style>
+    body {
+      background-color: #2f3b3e;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .controls {
+      margin-right: 40px;
+      text-align: left;
+    }
+    input {
+      width: 150px;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 8px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-agregar { background-color: #4CAF50; }
+    .btn-buscar { background-color: #2196F3; }
+    .btn-eliminar { background-color: #f44336; }
+    .btn-modificar { background-color: #ff9800; }
+    table {
+      width: 600px;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #78909c;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #546e7a;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Tareas</h1>
+  
+  <div class="container">
+    <div class="controls">
+      <label for="idInput">Id de tarea</label><br>
+      <input type="number" id="idInput" placeholder="Ej: 101"><br>
+      <label for="tareaInput">Tarea</label><br>
+      <input type="text" id="tareaInput" placeholder="Descripción de la tarea"><br>
+      <button class="btn-agregar" onclick="agregar()">Agregar</button>
+      <button class="btn-buscar" onclick="buscar()">Buscar</button>
+      <button class="btn-eliminar" onclick="eliminar()">Eliminar</button>
+      <button class="btn-modificar" onclick="modificar()">Modificar</button>
+    </div>
+  </div>
+
+  <table id="tablaTareas">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Tarea</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p>Cantidad de tareas programadas: <span id="contadorTareas">0</span></p>
+  
+  <script>
+    // **Mejora 1: Usar una clase para la lista enlazada**
+    // En lugar de funciones sueltas, se usa la sintaxis de 'class' que es la forma moderna de JavaScript.
+    // Esto agrupa la lógica de la lista en un solo lugar y es más claro.
+    class Nodo {
+        constructor(id, valor) {
+            this.id = id;
+            this.valor = valor;
+            this.siguiente = null;
+        }
+    }
+
+    class Lista {
+        constructor() {
+            this.cabecera = null;
+        }
+
+        add(id, valor) {
+            const nuevoNodo = new Nodo(id, valor);
+            if (this.cabecera === null) {
+                this.cabecera = nuevoNodo;
+            } else {
+                let enlace = this.cabecera;
+                while (enlace.siguiente !== null) {
+                    enlace = enlace.siguiente;
+                }
+                enlace.siguiente = nuevoNodo;
+            }
+        }
+
+        buscar(id) {
+            let referencia = this.cabecera;
+            // Se usa un 'return' temprano para un código más limpio.
+            while (referencia !== null) {
+                if (referencia.id == id) {
+                    return referencia;
+                }
+                referencia = referencia.siguiente;
+            }
+            return null;
+        }
+
+        eliminar(id) {
+            if (!this.cabecera) {
+                return false;
+            }
+            if (this.cabecera.id == id) {
+                this.cabecera = this.cabecera.siguiente;
+                return true;
+            }
+            let referencia = this.cabecera;
+            while (referencia.siguiente !== null && referencia.siguiente.id != id) {
+                referencia = referencia.siguiente;
+            }
+            if (referencia.siguiente !== null) {
+                referencia.siguiente = referencia.siguiente.siguiente;
+                return true;
+            }
+            return false;
+        }
+
+        modificar(id, nuevoValor) {
+            let nodo = this.buscar(id);
+            if (nodo) {
+                nodo.valor = nuevoValor;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // Variables globales
+    let lista = new Lista();
+    let idCounter = 1;
+
+    // **Mejora 2: Obtener elementos del DOM una sola vez**
+    // Se obtienen los elementos al inicio para evitar buscarlos en cada función.
+    const idInput = document.getElementById("idInput");
+    const tareaInput = document.getElementById("tareaInput");
+    const tablaBody = document.querySelector("#tablaTareas tbody");
+    const contadorSpan = document.getElementById("contadorTareas");
+
+    function agregar() {
+      let tarea = tareaInput.value;
+      // **Optimización 1: Validar el input antes de agregar**
+      // Se usa un 'if' para asegurar que la tarea no sea una cadena vacía o con solo espacios.
+      if (tarea.trim() !== "") {
+        lista.add(idCounter, tarea.trim());
+        idCounter++; 
+        tareaInput.value = "";
+        mostrarLista();
+      }
+    }
+    
+    function buscar() {
+      // **Optimización 2: Parsear el ID a entero**
+      // Se usa 'parseInt' para asegurar que el ID sea un número, no una cadena de texto.
+      let id = parseInt(idInput.value);
+      if (!isNaN(id)) {
+        let nodoEncontrado = lista.buscar(id);
+        // **Mejora 3: Usar 'if/else' con la búsqueda para la lógica**
+        // Aunque no muestre un mensaje, es buena práctica hacer algo con el resultado de la búsqueda.
+        if (nodoEncontrado) {
+          console.log("Tarea encontrada:", nodoEncontrado.valor);
+        } else {
+          console.log("No se encontró la tarea con Id:", id);
+        }
+      }
+    }
+    
+    function eliminar() {
+      let id = parseInt(idInput.value);
+      if (!isNaN(id)) {
+        lista.eliminar(id);
+        mostrarLista();
+      }
+    }
+
+    function modificar() {
+      let id = parseInt(idInput.value);
+      let nuevaTarea = tareaInput.value;
+      if (!isNaN(id) && nuevaTarea.trim() !== "") {
+        lista.modificar(id, nuevaTarea.trim());
+        mostrarLista();
+      }
+    }
+
+    // **Mejora 4: Refactorizar mostrarLista para que sea más clara**
+    // Se eliminó la concatenación de strings para una mejor legibilidad.
+    function mostrarLista() {
+      tablaBody.innerHTML = '';
+      let referencia = lista.cabecera;
+      let count = 0;
+      while (referencia !== null) {
+        const fila = document.createElement('tr');
+        const celdaId = document.createElement('td');
+        const celdaTarea = document.createElement('td');
+        
+        celdaId.textContent = referencia.id;
+        celdaTarea.textContent = referencia.valor;
+
+        fila.appendChild(celdaId);
+        fila.appendChild(celdaTarea);
+        tablaBody.appendChild(fila);
+
+        referencia = referencia.siguiente;
+        count++;
+      }
+      contadorSpan.textContent = count;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Examen</h1>
+
+    <div class="controlador">
+        
+    </div>
+
+
+    <script>
+        function Tree(value){
+            this.data = value
+            this.left = null
+            this.right = null
+        }
+
+        Tree.prototype.add = function (valor){
+
+            if(valor < this.data){
+                if(this.left === null){
+                    this.left = new Tree(valor)
+                }
+                else{
+                    this.left.add(valor)
+                }
+            }
+            else{
+                if(this.right === null){
+                    this.right = new Tree(valor)
+                }
+                else{
+                    this.right.add(valor)
+                }
+            }
+        }
+
+        Tree.prototype.PreOder = function(array){
+            array.push(this.data)
+
+            if(this.left !== null){
+                this.left.InOder(array)
+            }
+
+
+            if(this.right !== null){
+                this.right.InOder(array)
+            }
+        }
+
+        Tree.prototype.InOder = function(array){
+            if(this.left !== null){
+                this.left.InOder(array)
+            }
+
+            array.push(this.data)
+
+            if(this.right !== null){
+                this.right.InOder(array)
+            }
+        }
+
+        Tree.prototype.PosOder = function(array){
+            if(this.left !== null){
+                this.left.InOder(array)
+            }
+
+            
+            if(this.right !== null){
+                this.right.InOder(array)
+            }
+
+            array.push(this.data)
+        }
+
+        Tree.prototype.search = function(valor,array){
+            array.push(this.data)
+
+            if(valor === this.data){
+                return "Encontrado"
+            }
+
+            if(valor < this.data){
+                if(this.left === null){
+                    return "No encontrado"
+                }
+                return this.left.search(valor,array)
+            }
+            if(valor > this.data){
+                if(this.right === null){
+                    return "No encontrado"
+                }
+                return this.right.search(valor,array)
+            }
+        }
+
+
+        let miArbol = new Tree(25)
+
+        function agregarAleatorios(min,max){
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+        
+        for (let i = 0; i < 19; i++) { 
+            let nuevoNumero = agregarAleatorios(1,50)
+            miArbol.add(nuevoNumero)
+        }
+
+        let contenedor = []
+        miArbol.PosOder(contenedor)
+        console.log(contenedor)
+        
+        let valorEncontrar = 6
+        let almacen = []
+        let resultado = miArbol.search(6,almacen)
+        console.log(almacen)
+        console.log(resultado)
+
+
+
+    </script>
+</body>
+</html>

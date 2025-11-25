@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación Backend - StockPro</title>
+    
+    <style>
+        /* --- 1. Configuración General y Reset --- */
+        :root {
+            --color-primario: #005A9C; /* Azul profesional */
+            --color-secundario: #007bff; /* Azul más brillante para acentos */
+            --color-texto: #333;
+            --color-texto-claro: #555;
+            --color-fondo: #f8f9fa;
+            --color-slide: #ffffff;
+            --color-codigo-fondo: #f1f1f1;
+            --color-borde: #dee2e6;
+            --fuente-principal: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --fuente-codigo: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--fuente-principal);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6;
+            font-size: 16px; /* Base de 16px */
+        }
+
+        /* --- 2. Encabezado Fijo --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--color-slide);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        header .logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-primario);
+        }
+
+        header .info {
+            font-size: 0.9rem;
+            color: var(--color-texto-claro);
+            text-align: right;
+        }
+
+        /* --- 3. Contenedor Principal de Slides --- */
+        main {
+            padding-top: 80px; /* Espacio para el header fijo */
+            padding-bottom: 80px; /* Espacio para la navegación fija */
+        }
+
+        /* --- 4. Estilo de Slides Individuales --- */
+        .slide {
+            display: none; /* Oculto por defecto */
+            width: 90%;
+            max-width: 1200px;
+            height: calc(100vh - 160px); /* Alto de viewport menos header y footer */
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+            background-color: var(--color-slide);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow-y: auto; /* Scroll si el contenido es muy largo */
+            opacity: 0;
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Animación de entrada */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- 5. Estilos de Contenido Dentro de Slides --- */
+        .slide h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primario);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--color-borde);
+            padding-bottom: 0.75rem;
+        }
+
+        .slide h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-secundario);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .slide p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .slide ul, .slide ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide li {
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- 6. Estilos de Código y Diagramas --- */
+        pre {
+            background-color: var(--color-codigo-fondo);
+            border: 1px solid var(--color-borde);
+            border-radius: 5px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            font-family: var(--fuente-codigo);
+            color: #333;
+        }
+        
+        /* Diagramas ASCII */
+        pre.ascii-diagram {
+            line-height: 1.3;
+            font-size: 0.9rem;
+            background-color: #fdfdfd;
+        }
+
+        /* Colores simples para sintaxis */
+        code.language-python .comentario { color: #008000; }
+        code.language-python .keyword { color: #0000ff; }
+        code.language-python .string { color: #a31515; }
+        
+        /* Slide de Portada */
+        .slide.cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: calc(100vh - 160px);
+        }
+
+        .slide.cover h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-primario);
+            margin-bottom: 1rem;
+        }
+
+        .slide.cover h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: var(--color-texto-claro);
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 2rem;
+        }
+
+        .slide.cover p {
+            font-size: 1.25rem;
+            color: var(--color-texto);
+        }
+
+        /* --- 7. Navegación Fija --- */
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--color-slide);
+            border-top: 1px solid var(--color-borde);
+            z-index: 100;
+        }
+
+        .navigation button {
+            font-family: var(--fuente-principal);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: var(--color-secundario);
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .navigation button:hover:not(:disabled) {
+            background-color: var(--color-primario);
+        }
+        
+        .navigation button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .navigation button:disabled {
+            background-color: #c0c0c0;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: var(--color-texto-claro);
+            font-weight: 600;
+        }
+        
+        /* --- 8. Estilos de Impresión (Exportar a PDF) --- */
+        @media print {
+            /* Ocultar elementos interactivos */
+            header, .navigation {
+                display: none;
+            }
+
+            /* Resetear cuerpo y fondo */
+            body {
+                background-color: #fff;
+                font-size: 12pt;
+            }
+
+            /* Mostrar todas las slides */
+            main {
+                padding: 0;
+            }
+            
+            .slide {
+                display: block !important;
+                opacity: 1 !important;
+                transform: none !important;
+                
+                /* Resetear estilos de slide para impresión */
+                height: auto;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 1.5rem;
+                box-shadow: none;
+                border: 1px solid var(--color-borde);
+                border-radius: 0;
+                overflow: visible;
+
+                /* Forzar salto de página después de cada slide */
+                page-break-after: always;
+            }
+            
+            .slide:last-child {
+                page-break-after: auto;
+            }
+
+            /* Evitar que títulos o código se corten entre páginas */
+            h2, h3, pre {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+            
+            pre {
+                background-color: var(--color-codigo-fondo) !important; /* Forzar fondo en impresión */
+            }
+
+            .slide.cover {
+                height: 90vh; /* Ajustar portada para impresión */
+                page-break-after: always;
+            }
+
+            /* Imprimir enlaces (aunque no hay en este caso) */
+            a:after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">📊 StockPro Backend</div>
+        <div class="info">
+            <div>Tu Nombre</div>
+            <div>Noviembre 2025</div>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="slide cover active">
+            <h1>Backend de StockPro</h1>
+            <h2>Sistema de Gestión Empresarial</h2>
+            <p>Arquitectura, Patrones y Decisiones Técnicas</p>
+        </section>
+
+        <section class="slide">
+            <h2>🏗️ Arquitectura General del Sistema</h2>
+            <h3>Stack Tecnológico Backend</h3>
+            <pre class="ascii-diagram"><code>┌─────────────────────────────────────┐
+│   CAPA DE PRESENTACIÓN (Frontend)   │
+│   Bootstrap 5 + HTMX + JavaScript   │
+└─────────────────────────────────────┘
+              ↓ HTTP/HTTPS
+┌─────────────────────────────────────┐
+│      CAPA DE APLICACIÓN (Django)    │
+│   - Views (CBV + FBV)               │
+│   - Forms & Filters                 │
+│   - URL Routing                     │
+└─────────────────────────────────────┘
+              ↓ ORM
+┌─────────────────────────────────────┐
+│    CAPA DE DOMINIO (Models)         │
+│   - Lógica de Negocio               │
+│   - Validaciones                    │
+└─────────────────────────────────────┘
+              ↓ SQL
+┌─────────────────────────────────────┐
+│    CAPA DE PERSISTENCIA             │
+│   SQLite (Dev) / PostgreSQL (Prod)  │
+└─────────────────────────────────────┘</code></pre>
+            <h3>Puntos clave:</h3>
+            <ul>
+                <li>Arquitectura en capas (Layered Architecture)</li>
+                <li>Separación de responsabilidades (Separation of Concerns)</li>
+                <li>Framework Django como columna vertebral</li>
+                <li>ORM para abstracción de base de datos</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>📐 Patrón MVT (Model-View-Template)</h2>
+            <h3>Django implementa MVT, una variante de MVC</h3>
+            
+            <h3>Model - Lógica de Datos y Negocio</h3>
+            <pre><code class="language-python"># models.py
+class Producto(models.Model):
+    nombre = models.CharField(max_length=200)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def get_stock_total(self):
+        # Lógica de negocio encapsulada
+        return self.lotes.aggregate(total=Sum('cantidad_actual'))['total']</code></pre>
+            
+            <h3>View - Controlador de Lógica</h3>
+            <pre><code class="language-python"># views.py
+class ProductListView(ListView):
+    model = Producto
+    template_name = "stock/product_list.html"
+    
+    def get_queryset(self):
+        # Filtrado y procesamiento de datos
+        return Producto.objects.filter(is_active=True)</code></pre>
+            
+            <h3>Template - Presentación (HTML)</h3>
+            <p>Renderiza los datos procesados por la View (HTML + Template Tags).</p>
+        </section>
+
+        <section class="slide">
+            <h2>🗄️ Diseño de Base de Datos - Modelo Relacional</h2>
+            <h3>Entidades Principales y Relaciones</h3>
+            <pre class="ascii-diagram"><code>USUARIOS (Autenticación & Autorización)
+├── Usuario (AbstractUser personalizado)
+├── Rol (1:N con Usuario)
+└── Cliente (1:1 con Usuario)
+
+STOCK (Gestión de Inventario)
+├── Producto (Entidad central)
+├── Lote (1:N con Producto) ⭐ DECISIÓN CLAVE
+├── Categoría (1:N con Producto)
+├── Marca (1:N con Producto)
+└── UnidadMedida (1:1 con Producto)
+
+VENTAS (Transacciones)
+├── Venta (Cabecera)
+├── DetalleVenta (1:N con Venta)
+└── MetodoPago (1:N con Venta)
+
+FINANZAS (Control de Gastos)
+├── Gasto
+└── CategoriaGasto (1:N con Gasto)
+
+CIERRES (Arqueo de Caja)
+├── CierreCaja
+└── DetalleCierre (1:N con CierreCaja)</code></pre>
+            <h3>Destacado:</h3>
+            <ul>
+                <li>Normalización hasta 3FN (evita redundancia)</li>
+                <li>Integridad referencial con Foreign Keys</li>
+                <li>Uso estratégico de <code>on_delete</code> (CASCADE, SET_NULL, PROTECT)</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>⭐ Decisión Técnica Crítica: Sistema de Lotes</h2>
+            <h3>¿Por qué NO almacenar stock directamente en Producto?</h3>
+
+            <h4>❌ Enfoque Tradicional (Problemático)</h4>
+            <pre><code class="language-python">class Producto(models.Model):
+    nombre = models.CharField(max_length=200)
+    stock = models.IntegerField()  # ❌ Simplista
+    # Problemas:
+    # - No maneja fechas de vencimiento
+    # - No rastrea origen de mercadería
+    # - No permite FIFO/FEFO
+</code></pre>
+
+            <h4>✅ Nuestro Enfoque: Sistema de Lotes</h4>
+            <pre><code class="language-python">class Producto(models.Model):
+    nombre = models.CharField(max_length=200)
+    # NO tiene campo stock directo
+    
+    def get_stock_total(self):
+        # Stock calculado dinámicamente
+        return self.lotes.aggregate(total=Sum('cantidad_actual'))['total']
+
+class Lote(models.Model):
+    producto = models.ForeignKey(Producto, related_name='lotes')
+    cantidad_actual = models.DecimalField(max_digits=10, decimal_places=3)
+    precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha_vencimiento = models.DateField(null=True, blank=True)</code></pre>
+            
+            <h3>Ventajas:</h3>
+            <ol>
+                <li><strong>Trazabilidad:</strong> Cada ingreso de mercadería queda registrado.</li>
+                <li><strong>Gestión de Vencimientos:</strong> Control por lote individual.</li>
+                <li><strong>Cálculo de Rentabilidad:</strong> Precio compra vs. precio venta.</li>
+                <li><strong>FIFO/FEFO:</strong> Ordenamiento automático por fecha.</li>
+            </ol>
+        </section>
+
+        <section class="slide">
+            <h2>🔐 Autenticación y Autorización</h2>
+            <h3>Sistema de Usuarios Personalizado</h3>
+            <pre><code class="language-python"># Extendemos AbstractUser de Django
+class Usuario(AbstractUser):
+    email = models.EmailField(unique=True)
+    nombre_completo = models.CharField(max_length=150)
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
+    
+    USERNAME_FIELD = 'email'  # Login con email, no username
+    
+    def save(self, *args, **kwargs):
+        # Lógica de permisos automática
+        if self.rol and self.rol.nombre in ['Administrador', 'Vendedor']:
+            self.is_staff = True
+        super().save(*args, **kwargs)</code></pre>
+            <h3>Características:</h3>
+            <ul>
+                <li><strong>Autenticación basada en Email</strong> (más moderno que username).</li>
+                <li><strong>Sistema de Roles dinámico</strong> (no hardcodeado).</li>
+                <li>Permisos automáticos según rol asignado.</li>
+                <li>Contraseñas hasheadas (PBKDF2 por defecto).</li>
+                <li>Protección CSRF activa.</li>
+            </ul>
+        </section>
+        
+        <section class="slide">
+            <h2>🎨 Vistas - Class-Based Views (CBV)</h2>
+            <h3>Ventaja de CBV: Reutilización y DRY (Don't Repeat Yourself)</h3>
+            <pre><code class="language-python"># Django proporciona vistas genéricas potentes
+class ProductListView(ListView):
+    model = Producto
+    template_name = "stock/product_list.html"
+    context_object_name = 'productos'
+    
+    def get_queryset(self):
+        # Personalización: filtrado por estado activo
+        queryset = super().get_queryset()
+        if self.request.GET.get('mostrar_ocultos'):
+            return queryset.filter(is_active=False)
+        return queryset.filter(is_active=True)
+    
+    def get_context_data(self, **kwargs):
+        # Inyección de datos adicionales al contexto
+        context = super().get_context_data(**kwargs)
+        context['filterset'] = ProductFilter(self.request.GET, queryset=self.get_queryset())
+        return context</code></pre>
+            <h3>Tipos de CBV utilizados:</h3>
+            <ul>
+                <li><code>ListView</code> - Listado de objetos con paginación.</li>
+                <li><code>CreateView</code> - Formularios de creación.</li>
+                <li><code>UpdateView</code> - Formularios de edición.</li>
+                <li><code>DeleteView</code> - Confirmación de eliminación.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>🔍 ORM de Django - Abstracción de Base de Datos</h2>
+            <h3>Consultas Complejas sin SQL Directo</h3>
+
+            <h4>Ejemplo 1: Agregación</h4>
+            <pre><code class="language-python">def get_stock_total(self):
+    total = self.lotes.aggregate(total_stock=Sum('cantidad_actual'))['total_stock']
+    return total if total is not None else 0</code></pre>
+
+            <h4>Ejemplo 2: Filtrado con relaciones (JOIN implícito)</h4>
+            <pre><code class="language-python">productos_bajo_stock = Producto.objects.annotate(
+    stock_total=Sum('lotes__cantidad_actual')
+).filter(
+    stock_total__lt=F('stock_minimo'),
+    is_active=True
+)</code></pre>
+
+            <h3>Ventajas del ORM:</h3>
+            <ul>
+                <li><strong>Portabilidad:</strong> Cambiar de SQLite a PostgreSQL sin cambiar código.</li>
+                <li><strong>Seguridad:</strong> Protección contra SQL Injection automática.</li>
+                <li><strong>Optimización:</strong> Lazy loading, <code>select_related</code>, <code>prefetch_related</code>.</li>
+                <li><strong>Migraciones:</strong> Control de versiones del esquema de BD.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>📦 Modularidad - Arquitectura de Aplicaciones</h2>
+            <h3>Estructura del Proyecto</h3>
+            <pre class="ascii-diagram"><code>stockpro/                    # Proyecto Django
+├── manage.py
+├── stockpro/               # Configuración principal
+│   ├── settings.py         # Configuración global
+│   ├── urls.py             # Enrutamiento principal
+│   └── wsgi.py
+│
+└── applications/           # Apps modulares
+    ├── usuarios/           # Autenticación y roles
+    │   ├── models.py
+    │   ├── views.py
+    │   └── urls.py
+    ├── stock/              # Gestión de inventario
+    ├── ventas/             # Punto de venta
+    ├── finanzas/           # Control de gastos
+    ├── cierres/            # Arqueo de caja
+    ├── pedidos/            # Reservas de clientes
+    └── dashboard/          # Panel principal</code></pre>
+            <h3>Principio de Diseño:</h3>
+            <ul>
+                <li><strong>Alta Cohesión:</strong> Cada app tiene una responsabilidad clara.</li>
+                <li><strong>Bajo Acoplamiento:</strong> Apps se comunican por interfaces definidas.</li>
+                <li><strong>Reutilización:</strong> Apps pueden usarse en otros proyectos.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>🔄 Manejo de Transacciones y Consistencia</h2>
+            <h3>Integridad de Datos en Operaciones Críticas (ACID)</h3>
+            <pre><code class="language-python">from django.db import transaction
+
+@transaction.atomic
+def procesar_venta(productos_vendidos, metodo_pago, cliente):
+    """
+    Garantiza que TODA la venta se procese o NADA se procese.
+    Si falla cualquier paso, se hace ROLLBACK automático.
+    """
+    # 1. Crear la venta
+    venta = Venta.objects.create(...)
+    
+    # 2. Crear detalles y descontar stock
+    for item in productos_vendidos:
+        DetalleVenta.objects.create(...)
+        
+        # 3. Descontar del lote más antiguo (FIFO)
+        descontar_stock_de_lotes(item.producto, item.cantidad)
+    
+    # 4. Calcular total
+    venta.total = ...
+    venta.save()
+    
+    return venta</code></pre>
+            <h3>Conceptos aplicados:</h3>
+            <ul>
+                <li><strong>Atomicidad:</strong> Todo o nada.</li>
+                <li><strong>Consistencia:</strong> Estado válido siempre.</li>
+                <li><strong>Aislamiento:</strong> Transacciones concurrentes no interfieren.</li>
+                <li><strong>Durabilidad:</strong> Cambios persistentes.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>🚀 Deployment y Containerización</h2>
+            <h3>Docker para Entornos Consistentes</h3>
+            
+            <h4>Dockerfile - Imagen reproducible</h4>
+            <pre><code class="language-dockerfile">FROM python:3.11-slim
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+WORKDIR /app
+RUN apt-get update && apt-get install -y build-essential
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]</code></pre>
+
+            <h4>docker-compose.yml - Orquestación de servicios</h4>
+            <pre><code class="language-yaml">services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+  
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/</code></pre>
+            
+            <h3>Ventajas:</h3>
+            <ul>
+                <li><strong>Portabilidad:</strong> "Funciona en mi máquina" → "Funciona en todas".</li>
+                <li><strong>Escalabilidad:</strong> Fácil replicar servicios.</li>
+                <li><strong>Aislamiento:</strong> Dependencias no conflictivas.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>🛡️ Buenas Prácticas Implementadas</h2>
+            <h3>Principios SOLID y Clean Code</h3>
+
+            <h4>1. Single Responsibility Principle (SRP)</h4>
+            <p><code>Producto</code> gestiona datos del producto, <code>Lote</code> gestiona stock por lote.</p>
+            
+            <h4>2. Don't Repeat Yourself (DRY)</h4>
+            <pre><code class="language-python"># ✅ Lógica reutilizable en métodos del modelo
+def get_stock_total(self):
+    return self.lotes.aggregate(total=Sum('cantidad_actual'))['total']
+# Usado en: vistas, templates, reportes, API</code></pre>
+            
+            <h4>3. Separation of Concerns</h4>
+            <p>Models (datos), Views (lógica), Templates (presentación), Forms (validación).</p>
+            
+            <h4>4. Soft Delete Pattern</h4>
+            <pre><code class="language-python">is_active = models.BooleanField(default=True)
+# No eliminamos físicamente, marcamos como inactivo
+# Permite auditoría y recuperación</code></pre>
+        </section>
+
+        <section class="slide">
+            <h2>📊 Optimización y Performance</h2>
+            <h3>Estrategias Implementadas</h3>
+
+            <h4>1. Query Optimization (Evitar N+1)</h4>
+            <pre><code class="language-python"># ❌ Problema N+1 (N queries)
+for producto in Producto.objects.all():
+    print(producto.marca.nombre)
+
+# ✅ Solución: select_related (1 query con JOIN)
+productos = Producto.objects.select_related('marca', 'categoria')
+for producto in productos:
+    print(producto.marca.nombre)</code></pre>
+            
+            <h4>2. Indexación de Base de Datos</h4>
+            <pre><code class="language-python">class Meta:
+    indexes = [
+        models.Index(fields=['nombre']),  # Búsquedas rápidas
+    ]</code></pre>
+
+            <h4>3. Paginación</h4>
+            <pre><code class="language-python">class ProductListView(ListView):
+    paginate_by = 25  # Evita cargar miles de registros</code></pre>
+        </section>
+
+        <section class="slide">
+            <h2>🔮 Escalabilidad y Futuras Mejoras</h2>
+            <h3>Próximas Mejoras Técnicas</h3>
+
+            <h4>1. API RESTful (con Django REST Framework)</h4>
+            <pre><code class="language-python">class ProductoViewSet(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+    # Permite integración con apps móviles, otros sistemas</code></pre>
+            
+            <h4>2. Caché Distribuido (con Redis)</h4>
+            <pre><code class="language-python"># Para sesiones y queries pesadas
+CACHES = {
+    'default': { 'BACKEND': 'django_redis.cache.RedisCache', ... }
+}</code></pre>
+
+            <h4>3. Tareas Asíncronas (con Celery)</h4>
+            <pre><code class="language-python"># Reportes pesados, envío de emails, notificaciones
+@shared_task
+def generar_reporte_mensual():
+    # Se ejecuta en background, no bloquea al usuario
+    pass</code></pre>
+
+            <h4>4. Testing Automatizado</h4>
+            <p>Implementar tests unitarios y de integración para garantizar estabilidad.</p>
+        </section>
+
+        <section class="slide">
+            <h2>🎓 Conclusiones Técnicas</h2>
+            <h3>Decisiones de Diseño Justificadas</h3>
+
+            <h4>1. Django como Framework</h4>
+            <ul>
+                <li><strong>Pro:</strong> "Batteries included" (ORM, Admin, Auth) acelera el desarrollo.</li>
+                <li><strong>Pro:</strong> Seguridad por defecto (CSRF, SQL Injection).</li>
+                <li><strong>Contra:</strong> Monolítico (mitigado con arquitectura de apps modulares).</li>
+            </ul>
+
+            <h4>2. Sistema de Lotes vs Stock Directo</h4>
+            <ul>
+                <li><strong>Decisión crítica</strong> que diferencia un sistema amateur de uno profesional.</li>
+                <li>Permite trazabilidad completa y gestión de vencimientos.</li>
+                <li>Base para futuras funcionalidades (rentabilidad por lote, FIFO).</li>
+            </ul>
+
+            <h4>3. Class-Based Views (CBV)</h4>
+            <ul>
+                <li>Menos código, más mantenible a largo plazo.</li>
+                <li>Trade-off: curva de aprendizaje inicial mayor que vistas funcionales.</li>
+            </ul>
+
+            <h4>4. Soft Delete</h4>
+            <ul>
+                <li>Esencial para auditoría, cumplimiento normativo y recuperación de datos.</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>💡 Demo en Vivo (Opcional)</h2>
+            <h3>Mostrar en <code>python manage.py shell</code></h3>
+            <pre><code class="language-python"># 1. Crear un producto
+from applications.stock.models import *
+producto = Producto.objects.create(nombre="Coca Cola 2L", ...)
+
+# 2. Agregar lotes
+Lote.objects.create(
+    producto=producto,
+    cantidad_actual=50,
+    precio_compra=80.00
+)
+
+# 3. Consultar stock (usando el método del modelo)
+print(f"Stock total: {producto.get_stock_total()}")
+# Output: Stock total: 50
+
+# 4. Mostrar query SQL generada por el ORM
+print(Producto.objects.filter(is_active=True).query)</code></pre>
+        </section>
+
+        <section class="slide">
+            <h2>📚 Recursos y Referencias</h2>
+            <h3>Tecnologías y Documentación</h3>
+            <ul>
+                <li>Django Documentation</li>
+                <li>Two Scoops of Django (Best practices)</li>
+                <li>Real Python (Tutoriales avanzados)</li>
+            </ul>
+            
+            <h3>Patrones de Diseño Aplicados</h3>
+            <ul>
+                <li>MVT (Model-View-Template)</li>
+                <li>Repository Pattern (Abstracción de datos vía ORM)</li>
+                <li>Decorator Pattern (Middlewares, @transaction.atomic)</li>
+            </ul>
+            
+            <h3>Principios SOLID</h3>
+            <ul>
+                <li><strong>S</strong>ingle Responsibility</li>
+                <li><strong>O</strong>pen/Closed</li>
+                <li><strong>L</strong>iskov Substitution</li>
+                <li><strong>I</strong>nterface Segregation</li>
+                <li><strong>D</strong>ependency Inversion</li>
+            </ul>
+        </section>
+
+        <section class="slide cover">
+            <h1>Backend de StockPro</h1>
+            <h2>No solo funciona, está bien diseñado.</h2>
+            <br>
+            <p><strong>Diferenciadores técnicos:</strong></p>
+            <ul style="text-align: left; max-width: 500px; margin: 1rem auto; display: inline-block;">
+                <li>✅ Sistema de lotes profesional.</li>
+                <li>✅ Autenticación basada en roles.</li>
+                <li>✅ Transacciones atómicas (ACID).</li>
+                <li>✅ Arquitectura modular y escalable.</li>
+            </ul>
+            <h2 style="margin-top: 2rem;">¿Preguntas?</h2>
+        </section>
+
+    </main>
+
+    <nav class="navigation">
+        <button id="prev" title="Anterior (←)">&larr; Anterior</button>
+        <button id="next" title="Siguiente (→)">Siguiente &rarr;</button>
+        <div id="slide-counter" class="slide-counter">1 / 18</div>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            const counter = document.getElementById('slide-counter');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            /**
+             * Muestra la slide en el índice dado.
+             * @param {number} index El índice de la slide a mostrar.
+             */
+            function showSlide(index) {
+                // Ocultar la slide actual (si hay una)
+                if (slides[currentSlide]) {
+                    slides[currentSlide].classList.remove('active');
+                }
+                
+                // Asegurarse que el índice está en los límites
+                currentSlide = Math.max(0, Math.min(index, totalSlides - 1));
+                
+                // Mostrar la nueva slide
+                if (slides[currentSlide]) {
+                    slides[currentSlide].classList.add('active');
+                }
+
+                // Actualizar estado de botones
+                prevBtn.disabled = (currentSlide === 0);
+                nextBtn.disabled = (currentSlide === totalSlides - 1);
+
+                // Actualizar contador
+                counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            }
+
+            // --- Event Listeners para Botones ---
+            
+            nextBtn.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+            });
+
+            prevBtn.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+            });
+
+            // --- Event Listeners para Teclado ---
+            
+            document.addEventListener('keydown', (e) => {
+                // Evitar que se dispare si se está escribiendo en un input (aunque no hay aquí)
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                switch (e.key) {
+                    case 'ArrowRight':
+                    case ' ': // Espacio también avanza
+                    case 'PageDown':
+                        e.preventDefault();
+                        if (currentSlide < totalSlides - 1) {
+                            nextBtn.click();
+                        }
+                        break;
+                        
+                    case 'ArrowLeft':
+                    case 'PageUp':
+                        e.preventDefault();
+                        if (currentSlide > 0) {
+                            prevBtn.click();
+                        }
+                        break;
+                        
+                    case 'Home':
+                        e.preventDefault();
+                        showSlide(0);
+                        break;
+                        
+                    case 'End':
+                        e.preventDefault();
+                        showSlide(totalSlides - 1);
+                        break;
+                }
+            });
+
+            // --- Inicialización ---
+            showSlide(0);
+        });
+    </script>
+
+</body>
+</html>

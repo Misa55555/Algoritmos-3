@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Cargar nombres</h1>
+    <form id="formularioNombres">
+        <label for="nombreInput"> Nombre</label>
+        <input type="text" id="nombreInput" required>
+        <button type="button" onclick="agregarNombre()"> Agregar nombre</button>
+    </form>
+
+    <h2>Lista de Nombres</h2>
+    <ul id="listaNombres"></ul>
+
+    <script>
+        let nombres = []
+
+        const formulario = document.getElementById('formularioNombres')
+        const inputNombre = document.getElementById("nombreInput")
+        const listaNombres = document.getElementById('listaNombres')
+
+        function agregarNombre(){
+            let nuevoNombre = inputNombre.value 
+
+            if(nuevoNombre !== ""){
+                nombres.push(nuevoNombre)
+
+                inputNombre.value = ""
+
+                mostrarNombres()
+            }
+        }
+
+        function mostrarNombres(){
+            listaNombres.innerHTML = ''
+
+            for (let i = 0; i < nombres.length; i++) {
+                const li = document.createElement('li')
+                li.textContent = nombres[i]
+                listaNombres.appendChild(li)
+            }
+        }
+    </script>
+</body>
+</html>
